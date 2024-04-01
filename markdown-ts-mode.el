@@ -3,7 +3,7 @@
 ;; Author: Rahul M. Juliato
 ;; Created: April 1st, 2024
 ;; Version: 0.1.0
-;; Keywords: markdown, tree-sitter, syntax
+;; Keywords: languages, matching, faces
 ;; URL: https://github.com/LionyxML/markdown-ts-mode
 ;; Package-Requires: ((emacs "29.1"))
 ;; SPDX-License-Identifier: GPL-3.0-or-later
@@ -83,8 +83,7 @@
 	      treesit-font-lock-feature-list '((atx_heading)
 					       (info_string)
 					       (paragraph)
-					       (link)
-					       ))
+					       (link)))
 
   (setq-local treesit-simple-imenu-settings
               `(("Heading" markdown-ts-imenu-node-p nil markdown-ts-imenu-name-function)))
