@@ -2,18 +2,30 @@
 #+AUTHOR: Rahul M. Juliato
 #+EMAIL: rahul.juliato@gmail.com
 
+[[https://melpa.org/#/markdown-ts-mode][file:https://melpa.org/packages/markdown-ts-mode-badge.svg]]
+
 A major mode for Emacs providing really BASIC syntax highlight for
-markdown files using treesitter.
+markdown files using Treesitter.
 
 Please note this provides very basic functionality. If you're looking
-for a fully featured mature mode, please go [[https://jblevins.org/projects/markdown-mode/][here]].
+for a fully featured mature mode, please consider [[https://jblevins.org/projects/markdown-mode/][markdown-mode]].
 
-** Installing
 
-(Yet) not available on MELPA.
+** Install
 
-Download `markdown-ts-mode.el` file to a directory of your liking. And add to your `init.el`
-file the path:
+This package is available on MELPA. If you already have it set, add to your ~init.el~ file:
+
+#+BEGIN_SRC elisp
+  (use-package markdown-ts-mode
+    :mode ("\\.md\\'" . markdown-ts-mode)
+    :defer 't
+    :config
+    (add-to-list 'treesit-language-source-alist '(markdown "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "main" "src")))
+#+END_SRC
+
+
+Alternatively, download the ~markdown-ts-mode.el~ file to a directory
+of your liking. And add to your ~init.el~ file the path:
 
 #+BEGIN_SRC elisp
   (add-to-list 'load-path "~/you_liked_dir/")
@@ -22,7 +34,7 @@ file the path:
     :mode ("\\.md\\'" . markdown-ts-mode)
     :defer 't
     :config
-    (add-to-list 'treesit-language-source-alist '(markdown "https://github.com/ikatyang/tree-sitter-markdown" "master" "src")))
+    (add-to-list 'treesit-language-source-alist '(markdown "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "main" "src")))
 #+END_SRC
 
 Before using it, be sure you have the grammar for markdown installed with.
@@ -31,10 +43,13 @@ Before using it, be sure you have the grammar for markdown installed with.
   M-x treesit-install-language-grammar RET markdown RET
 #+END_SRC
 
-** Using it
-Open a markdown file. Turn on the mode with `markdown-ts-mode`.
 
-Navigate trough headings with `imenu`.
+** Usage
+
+Visit a markdown file. Turn on the mode with ~markdown-ts-mode~.
+
+Navigate trough headings with ~imenu~.
+
 
 ** Screenshots
 
@@ -59,4 +74,15 @@ This shows the text provided by [[https://github.com/mxstbr/markdown-test-file/b
 [[./doc/demo09.png]]
 
 [[./doc/demo10.png]]
+
+[[./doc/demo11.png]]
+
+[[./doc/demo12.png]]
+
+
+** Contributing
+
+To contribute, submit a pull request or report a bug. This package is
+aspiring to be part of GNU ELPA. Major contributions must be from
+someone with FSF papers.
 
