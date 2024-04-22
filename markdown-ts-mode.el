@@ -2,7 +2,7 @@
 ;;
 ;; Author: Rahul M. Juliato
 ;; Created: April 1st, 2024
-;; Version: 0.2.0
+;; Version: 0.3.0
 ;; Keywords: languages, matching, faces
 ;; URL: https://github.com/LionyxML/markdown-ts-mode
 ;; Package-Requires: ((emacs "29.1"))
@@ -21,7 +21,11 @@
 ;;    :mode ("\\.md\\'" . markdown-ts-mode)
 ;;    :defer 't
 ;;    :config
-;;    (add-to-list 'treesit-language-source-alist '(markdown "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "main" "src")))
+;;    (add-to-list 'treesit-language-source-alist '(markdown "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown/src"))
+;;    (add-to-list 'treesit-language-source-alist '(markdown-inline "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown-inline/src")))
+;;
+;; NOTE: please note you need BOTH markdown and markdown-inline grammars installed!
+;;       so please, run `treesit-install-language-grammar' twice.
 ;;
 
 ;;; Code:
@@ -30,24 +34,16 @@
 
 (defvar markdown-ts--treesit-settings
   (treesit-font-lock-rules
-   :language 'markdown
+   :language 'markdown-inline
    :override t
    :feature 'delimiter
    '([ "[" "]" "(" ")" ] @shadow)
 
    :language 'markdown
    :feature 'paragraph
-   '([((image_description) @link)
-      ((link_destination) @font-lock-string-face)
-      ((setext_heading) @font-lock-keyword-face)
+   '([((setext_heading) @font-lock-keyword-face)
       ((atx_heading) @font-lock-keyword-face)
       ((thematic_break) @shadow)
-      ((code_span) @font-lock-string-face)
-      ((emphasis) @underline)
-      ((strong_emphasis) @bold)
-      (inline_link (link_text) @link)
-      (inline_link (link_destination) @font-lock-string-face)
-      (shortcut_link (link_text) @link)
       ((indented_code_block) @font-lock-string-face)
       (list_item (list_marker_star) @font-lock-keyword-face)
       (list_item (list_marker_plus) @font-lock-keyword-face)
@@ -58,7 +54,19 @@
       ((block_quote_marker) @font-lock-string-face)
       (block_quote (paragraph) @font-lock-string-face)
       (block_quote (block_quote_marker) @font-lock-string-face)
-      ])))
+      ])
+   
+   :language 'markdown-inline
+   :feature 'paragraph-inline
+   '([
+      ((image_description) @link)
+      ((link_destination) @font-lock-string-face)
+      ((code_span) @font-lock-string-face)
+      ((emphasis) @underline)
+      ((strong_emphasis) @bold)
+      (inline_link (link_text) @link)
+      (inline_link (link_destination) @font-lock-string-face)
+      (shortcut_link (link_text) @link)])))
 
 (defun markdown-ts-imenu-node-p (node)
   "Check if NODE is a valid entry to imenu."
@@ -82,12 +90,14 @@
   "Major mode for editing Markdown using tree-sitter grammar."
   (setq-local font-lock-defaults nil
 	          treesit-font-lock-feature-list '((delimiter)
-					                           (paragraph)))
+					                           (paragraph)
+					                           (paragraph-inline)))
 
   (setq-local treesit-simple-imenu-settings
               `(("Headings" markdown-ts-imenu-node-p nil markdown-ts-imenu-name-function)))
 
-  (when (treesit-ready-p 'markdown)
+  (when (treesit-ready-p 'markdown-inline)
+    (treesit-parser-create 'markdown-inline)
     (treesit-parser-create 'markdown)
     (markdown-ts-setup)))
 

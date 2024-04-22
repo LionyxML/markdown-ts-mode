@@ -20,7 +20,8 @@ This package is available on MELPA. If you already have it set, add to your ~ini
     :mode ("\\.md\\'" . markdown-ts-mode)
     :defer 't
     :config
-    (add-to-list 'treesit-language-source-alist '(markdown "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "main" "src")))
+    (add-to-list 'treesit-language-source-alist '(markdown "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown/src"))
+    (add-to-list 'treesit-language-source-alist '(markdown-inline "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown-inline/src")))
 #+END_SRC
 
 
@@ -34,14 +35,33 @@ of your liking. And add to your ~init.el~ file the path:
     :mode ("\\.md\\'" . markdown-ts-mode)
     :defer 't
     :config
-    (add-to-list 'treesit-language-source-alist '(markdown "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "main" "src")))
+    (add-to-list 'treesit-language-source-alist '(markdown "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown/src"))
+    (add-to-list 'treesit-language-source-alist '(markdown-inline "https://github.com/tree-sitter-grammars/tree-sitter-markdown" "split_parser" "tree-sitter-markdown-inline/src")))
 #+END_SRC
 
-Before using it, be sure you have the grammar for markdown installed with.
+** Don't skip this
+Before using it, be sure you have BOTH ~markdown~ and ~markdown-inline~ grammars installed.
 
 #+BEGIN_SRC elisp
   M-x treesit-install-language-grammar RET markdown RET
+  M-x treesit-install-language-grammar RET markdown-inline RET
 #+END_SRC
+
+** FAQ
+**** Why not use the "main" branch of tree-sitter-grammars repository?
+Visit the tree-sitter-grammars repository, you'll get redirected to
+the ~split_parser~ branch, since this is the default branch nowadays.
+
+If you visit the ~main~ branch, there's a note communicating it is not
+used anymore on the ~README.md~ file.
+
+**** Why do I have to install TWO grammars?
+Not my fault. The developers of tree-sitter-markdown decided so some
+years ago there would be 2 parsers, one to the "body" part of
+documents and one for "inline" statements.
+
+So if you're only seeing part of your markdown files highlighted, one
+of the grammars might be missing.
 
 
 ** Usage
