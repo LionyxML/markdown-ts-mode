@@ -40,8 +40,15 @@
 (require 'treesit)
 (require 'subr-x)
 (require 'outline)
+(eval-when-compile (require 'cl-lib))
 
-(treesit-declare-unavailable-functions)
+;; Remove when minimum Emacs is 31 (replace with treesit-declare-unavailable-functions)
+(declare-function treesit-node-parent "treesit.c")
+(declare-function treesit-node-child "treesit.c")
+(declare-function treesit-node-type "treesit.c")
+(declare-function treesit-parser-create "treesit.c")
+(declare-function treesit-range-fn-exclude-children "treesit")
+(defvar treesit-enabled-modes)
 
 (add-to-list
  'treesit-language-source-alist
@@ -111,6 +118,32 @@ maps to tree-sitter language `cpp'.")
   :type 'boolean
   :safe #'booleanp
   :group 'markdown-ts)
+
+;;; Emacs 30 compatibility shims
+;;
+;; These defalias forms resolve at load time (after `require 'treesit'
+;; above) to either the real Emacs 31 function or a fallback lambda.
+;; The fboundp check runs once and the result is locked in.
+
+;; Remove when minimum Emacs is 31
+(defalias 'markdown-ts--ensure-installed
+  (if (fboundp 'treesit-ensure-installed)
+      #'treesit-ensure-installed
+    (lambda (lang) (treesit-ready-p lang t))))
+
+;; Remove when minimum Emacs is 31
+(defalias 'markdown-ts--merge-font-lock-feature-list
+  (if (fboundp 'treesit-merge-font-lock-feature-list)
+      #'treesit-merge-font-lock-feature-list
+    (lambda (fl1 fl2)
+      (let ((result nil))
+        (while (or (car fl1) (car fl2))
+          (cond
+           ((and (car fl1) (not (car fl2))) (push (car fl1) result))
+           ((and (not (car fl1)) (car fl2)) (push (car fl2) result))
+           (t (push (cl-union (car fl1) (car fl2)) result)))
+          (setq fl1 (cdr fl1) fl2 (cdr fl2)))
+        (nreverse result)))))
 
 ;;; Faces
 
@@ -350,14 +383,19 @@ VALUE non-nil hides markup, nil shows it."
   (setq markdown-ts-hide-markup (not markdown-ts-hide-markup))
   (markdown-ts--set-hide-markup markdown-ts-hide-markup))
 
-
 ;;; Major mode
 
 (defun markdown-ts-setup ()
   "Setup treesit for `markdown-ts-mode'."
   (make-local-variable 'markdown-ts-hide-markup)
   (setq-local treesit-font-lock-settings markdown-ts--treesit-settings)
-  (setq-local treesit-range-settings (markdown-ts--range-settings))
+  ;; On Emacs 30, skip range settings: :range-fn and :embed function
+  ;; are unavailable, and the multi-range query-capture bug means the
+  ;; inline parser can't be scoped to individual blocks.  Both parsers
+  ;; see the whole buffer; inline rules use :override 'append so block
+  ;; rules win on fenced code content.  Remove guard when min Emacs is 31.
+  (when (fboundp 'treesit-range-fn-exclude-children)
+    (setq-local treesit-range-settings (markdown-ts--range-settings)))
   (add-to-list 'font-lock-extra-managed-props 'invisible)
 
   (when (treesit-ready-p 'html t)
@@ -369,7 +407,7 @@ VALUE non-nil hides markup, nil shows it."
                 (append treesit-font-lock-settings
                         html-ts-mode--font-lock-settings))
     (setq-local treesit-font-lock-feature-list
-                (treesit-merge-font-lock-feature-list
+                (markdown-ts--merge-font-lock-feature-list
                  treesit-font-lock-feature-list
                  html-ts-mode--treesit-font-lock-feature-list))
     (setq-local treesit-range-settings
@@ -392,7 +430,7 @@ VALUE non-nil hides markup, nil shows it."
                 (append treesit-font-lock-settings
                         yaml-ts-mode--font-lock-settings))
     (setq-local treesit-font-lock-feature-list
-                (treesit-merge-font-lock-feature-list
+                (markdown-ts--merge-font-lock-feature-list
                  treesit-font-lock-feature-list
                  yaml-ts-mode--font-lock-feature-list))
     (setq-local treesit-range-settings
@@ -411,7 +449,7 @@ VALUE non-nil hides markup, nil shows it."
           (append treesit-font-lock-settings
                   toml-ts-mode--font-lock-settings))
     (setq-local treesit-font-lock-feature-list
-                (treesit-merge-font-lock-feature-list
+                (markdown-ts--merge-font-lock-feature-list
                  treesit-font-lock-feature-list
                  toml-ts-mode--font-lock-feature-list))
     (setq-local treesit-range-settings
@@ -442,8 +480,8 @@ VALUE non-nil hides markup, nil shows it."
                  nil ,#'markdown-ts-imenu-name-function)))
   (setq-local treesit-outline-predicate #'markdown-ts-outline-predicate)
 
-  (when (and (treesit-ensure-installed 'markdown)
-             (treesit-ensure-installed 'markdown-inline))
+  (when (and (markdown-ts--ensure-installed 'markdown)
+             (markdown-ts--ensure-installed 'markdown-inline))
     (treesit-parser-create 'markdown-inline)
     (treesit-parser-create 'markdown)
     (markdown-ts-setup)))

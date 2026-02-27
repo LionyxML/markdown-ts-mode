@@ -1,0 +1,33 @@
+name: Tests
+on: [push, pull_request]
+jobs:
+  test:
+    name: Emacs ${{ matrix.emacs }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        emacs: ['30.1', 'snapshot']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: purcell/setup-emacs@master
+        with:
+          version: ${{ matrix.emacs }}
+      - name: Install tree-sitter grammars
+        run: |
+          emacs --batch -Q --eval '(progn
+            (setq treesit-language-source-alist
+              (quote ((markdown . ("https://github.com/tree-sitter-grammars/tree-sitter-markdown"
+                                   "v0.4.1" "tree-sitter-markdown/src"))
+                      (markdown-inline . ("https://github.com/tree-sitter-grammars/tree-sitter-markdown"
+                                          "v0.4.1" "tree-sitter-markdown-inline/src")))))
+            (treesit-install-language-grammar (quote markdown))
+            (treesit-install-language-grammar (quote markdown-inline))
+            (unless (and (treesit-language-available-p (quote markdown))
+                         (treesit-language-available-p (quote markdown-inline)))
+              (error "Grammar installation failed"))
+            (message "Grammars installed successfully"))'
+      - name: Byte-compile
+        run: make compile
+      - name: Run tests
+        run: make test
