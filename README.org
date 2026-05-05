@@ -4,16 +4,16 @@
 
 [[https://melpa.org/#/markdown-ts-mode][file:https://melpa.org/packages/markdown-ts-mode-badge.svg]]
 
-*NOTE*: Please note Emacs 31 (current master, not yet released) has
-~markdown-ts-mode~ built-in. Only use this package if you're running Emacs 30
-or older.
+*NOTE*: Emacs 31+ includes a built-in, super-charged ~markdown-ts-mode~,
+developed by this package's author together with Stéphane Marks, and
+derived from this package. If you are using Emacs 31 or newer, use the
+built-in mode instead.
 
-A major mode for Emacs providing really BASIC syntax highlight for
-markdown files using Treesitter.
+This package is intended only for Emacs 29 and 30, and will refuse to
+load on Emacs 31+.
 
-Please note this provides very basic functionality. If you're looking
-for a fully featured mature mode, please consider [[https://jblevins.org/projects/markdown-mode/][markdown-mode]].
-
+A major mode for Emacs providing basic syntax highlighting for Markdown
+files using Tree-sitter.
 
 ** Install
 
@@ -109,4 +109,3 @@ This shows the text provided by [[https://github.com/mxstbr/markdown-test-file/b
 To contribute, submit a pull request or report a bug. This package is
 aspiring to be part of GNU ELPA. Major contributions must be from
 someone with FSF papers.
-
