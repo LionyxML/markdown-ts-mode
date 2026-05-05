@@ -8,7 +8,19 @@
 ;; Package-Requires: ((emacs "29.1"))
 ;; SPDX-License-Identifier: GPL-3.0-or-later
 ;;
+;;
 ;;; Commentary:
+;;
+;; This package provides tree-sitter support for Markdown for Emacs
+;; 29–30.
+;;
+;; Emacs 31+ ships with a built-in `markdown-ts-mode`, written by the
+;; same author and derived from this package, which supersedes it and
+;; makes this package obsolete and incompatible.
+;;
+;;
+;;
+;;
 ;; `markdown-ts-mode` is a major mode that provides BASIC syntax
 ;; highlight and iMenu navigation.
 ;;
@@ -29,6 +41,10 @@
 ;;
 
 ;;; Code:
+(when (>= emacs-major-version 31)
+  (error
+   "Emacs >=31 includes a built-in `markdown-ts-mode`; this package is incompatible and should not be loaded"))
+
 (require 'treesit)
 (require 'subr-x)
 
@@ -55,7 +71,7 @@
       (block_quote (paragraph) @font-lock-string-face)
       (block_quote (block_quote_marker) @font-lock-string-face)
       ])
-   
+
    :language 'markdown-inline
    :feature 'paragraph-inline
    '([
@@ -77,7 +93,7 @@
   "Return an imenu entry if NODE is a valid header."
   (let ((name (treesit-node-text node)))
     (if (markdown-ts-imenu-node-p node)
-	(thread-first (treesit-node-parent node)(treesit-node-text))
+    (thread-first (treesit-node-parent node)(treesit-node-text))
       name)))
 
 (defun markdown-ts-setup ()
@@ -89,9 +105,9 @@
 (define-derived-mode markdown-ts-mode fundamental-mode "markdown[ts]"
   "Major mode for editing Markdown using tree-sitter grammar."
   (setq-local font-lock-defaults nil
-	          treesit-font-lock-feature-list '((delimiter)
-					                           (paragraph)
-					                           (paragraph-inline)))
+              treesit-font-lock-feature-list '((delimiter)
+                                               (paragraph)
+                                               (paragraph-inline)))
 
   (setq-local treesit-simple-imenu-settings
               `(("Headings" markdown-ts-imenu-node-p nil markdown-ts-imenu-name-function)))
