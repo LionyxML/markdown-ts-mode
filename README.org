@@ -1,19 +1,39 @@
-#+TITLE: markdown-ts-mode
+#+TITLE: markdown-ts-mode (deprecated)
 #+AUTHOR: Rahul M. Juliato
 #+EMAIL: rahul.juliato@gmail.com
 
-[[https://melpa.org/#/markdown-ts-mode][file:https://melpa.org/packages/markdown-ts-mode-badge.svg]]
+* Deprecation Notice
 
-*NOTE*: Emacs 31+ includes a built-in, super-charged ~markdown-ts-mode~,
-developed by this package's author together with Stéphane Marks, and
-derived from this package. If you are using Emacs 31 or newer, use the
-built-in mode instead.
+=NOTE:= Emacs *31* and newer ship with a built-in, enhanced
+~markdown-ts-mode~, developed by this package's author together with
+Stéphane Marks, and derived from this package. If you are using Emacs
+31 or newer, use the *built-in* mode.
+
+The built-in implementation lives in:
+
+- https://cgit.git.savannah.gnu.org/cgit/emacs.git/tree/lisp/textmodes/markdown-ts-mode.el
+- https://cgit.git.savannah.gnu.org/cgit/emacs.git/tree/lisp/textmodes/markdown-ts-mode-x.el
+
+Bug reports for the built-in mode should be filed at:
+
+- https://debbugs.gnu.org/
+
+Or directly from Emacs with =M-x report-emacs-bug RET=.
+
+Or (less recommended) through the development repository for this new
+built-in mode available at:
+
+- https://github.com/LionyxML/markdown-ts-mode-lab (primary)
+- https://codeberg.org/LionyxML/markdown-ts-mode-lab (mirror)
+
+
+* If you still opt to use this package
 
 This package is intended only for Emacs 29 and 30, and will refuse to
-load on Emacs 31+.
+load on Emacs 31+. It is no longer maintained.
 
-A major mode for Emacs providing basic syntax highlighting for Markdown
-files using Tree-sitter.
+A major mode for Emacs providing basic syntax highlighting for
+Markdown files using Tree-sitter.
 
 ** Install
 
